@@ -16,23 +16,21 @@ const Index = () => {
 
   return (
     <div className="w-full">
-      
-      {/* Latest Blogs Title + Underline */}
-      <div className="pb-3 border-b mb-6">
-        <h2 className="text-2xl md:text-3xl font-bold">Latest Blogs</h2>
+      {/* Latest Blogs Title */}
+      <div className="pb-4 border-b mb-8">
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Latest Blogs</h2>
       </div>
 
-      {/* Blog List */}
-      <div className="space-y-5">
+      {/* Blog Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
         {blogs.length > 0 ? (
           blogs.map((blog) => <BlogCard key={blog._id} blog={blog} />)
         ) : (
-          <div className="text-center py-10 text-gray-500">
-            No blogs found.
+          <div className="text-center py-16 text-gray-500 col-span-full">
+            <p className="text-lg">No blogs found.</p>
           </div>
         )}
       </div>
-
     </div>
   );
 };
