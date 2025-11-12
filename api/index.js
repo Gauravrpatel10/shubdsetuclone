@@ -3,7 +3,6 @@ import dotenv from 'dotenv'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import mongoose from 'mongoose'
-import { Server as SocketServer } from "socket.io";
 import AuthRoute from './routes/Auth.route.js'
 import UserRoute from './routes/User.route.js'
 import CategoryRoute from './routes/Category.route.js'
@@ -14,30 +13,13 @@ import ViewRoute from './routes/view.route.js'
 import FollowRoute from './routes/follow.route.js'
 import SaveRoute from './routes/save.route.js'
 import NotificationRoute from './routes/notification.route.js'
-import { initNotificationIO } from "./utils/createNotification.js";
-import { createServer } from 'http';
 
 import { log } from 'console';
 import Blog from './models/blog.model.js';
 
 dotenv.config()
 
-const PORT = process.env.PORT
 const app = express()
-const server = createServer(app)
-
-const io = new SocketServer(server, { cors: { origin: "*" } });
-
-initNotificationIO(io);
-
-io.on('connection', (socket) => {
-
-    socket.on('auth:identify', (userId) => {
-        if (userId) {
-            socket.join(String(userId));
-        }
-    });
-});
 
 app.use(cookieParser());
 app.use(express.json());
@@ -67,14 +49,7 @@ app.use('/api/save', SaveRoute)
 app.use('/api/notifications', NotificationRoute)
 
 
-mongoose.connect(process.env.MONGODB_CONN,{dbName:'Shabd-Setu'})
-    .then(()=>console.log('Database connected.'))
-    .catch(err=>console.log('Database connection failed.',err))
-
-server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-})
-
+// Global error handler
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500
     const message = err.message || 'Internal server error.'
@@ -84,3 +59,18 @@ app.use((err, req, res, next) => {
         message
     })
 })
+
+// Connect to MongoDB
+let mongoConnected = false
+mongoose.connect(process.env.MONGODB_CONN, { dbName: 'Shabd-Setu' })
+    .then(() => {
+        mongoConnected = true
+        console.log('Database connected.')
+    })
+    .catch(err => {
+        mongoConnected = false
+        console.log('Database connection failed.', err)
+    })
+
+// Export for Vercel serverless
+export default app
