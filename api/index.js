@@ -50,7 +50,10 @@ app.use(
     })
 )
 
-
+app.use(cors({
+  origin: ['http://localhost:3000', 'https://shubdsetuclone.vercel.app'],
+  credentials: true
+}));
 
 app.use('/api/auth', AuthRoute)
 app.use('/api/user', UserRoute)
